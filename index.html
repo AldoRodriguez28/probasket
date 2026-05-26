@@ -79,7 +79,7 @@
     .h-eyebrow { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:24px; }
     .h-eyebrow span { font-size:.76rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--red); }
     .h-eyebrow::before,.h-eyebrow::after { content:''; flex:1; max-width:48px; height:1px; background:var(--red); opacity:.45; }
-    .h1 { font-family:var(--font-d); font-size:clamp(2.8rem,8vw,7rem); line-height:.93; letter-spacing:.02em; color:var(--text); margin-bottom:24px; }
+    .h1 { font-family:var(--font-d); font-size:clamp(2.8rem,5vw,4.5rem); line-height:.93; letter-spacing:.02em; color:var(--text); margin-bottom:24px; }
     .h1 em { color:var(--red); font-style:normal; }
     .h-sub { font-size:clamp(.88rem,2vw,1.05rem); color:var(--muted); margin-bottom:40px; letter-spacing:.04em; line-height:1.8; }
     .h-sub strong { color:var(--text); }
@@ -99,10 +99,10 @@
     .k-fg span { display:block; color:var(--red); }
 
     /* ── PROBLEMA ── */
-    #problema { position:relative; padding:120px 0; background:var(--bg2); overflow:hidden; }
+    #problema { position:relative; padding:96px 0; background:var(--bg2); overflow:hidden; }
     #spotlight { position:absolute; inset:0; pointer-events:none; z-index:0; }
-    .sec-head { text-align:center; margin-bottom:72px; position:relative; z-index:1; }
-    .sec-title { font-family:var(--font-d); font-size:clamp(2.4rem,5vw,4.5rem); line-height:1; letter-spacing:.02em; color:var(--text); }
+    .sec-head { text-align:center; margin-bottom:52px; position:relative; z-index:1; }
+    .sec-title { font-family:var(--font-d); font-size:clamp(2rem,3.5vw,3.4rem); line-height:1; letter-spacing:.02em; color:var(--text); }
     .sec-sub { font-size:.95rem; line-height:1.8; color:var(--muted); max-width:520px; margin:18px auto 0; }
     .p-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; max-width:880px; margin:0 auto; position:relative; z-index:1; }
     .p-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); padding:28px; display:flex; gap:18px; align-items:flex-start; transition:border-color .3s,transform .3s; }
@@ -115,7 +115,7 @@
     .p-vs strong { display:block; font-family:var(--font-d); font-size:clamp(1.8rem,4vw,2.8rem); color:var(--red); letter-spacing:.06em; margin-top:6px; }
 
     /* ── SISTEMA ── */
-    #sistema { position:relative; padding:120px 0; overflow:hidden; }
+    #sistema { position:relative; padding:96px 0; overflow:hidden; }
     #sistema::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(204,0,0,.06),rgba(20,40,80,.04),rgba(204,0,0,.06)); background-size:300% 300%; animation:gradShift 14s ease-in-out infinite; z-index:0; }
     .pasos { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; position:relative; z-index:1; margin-top:16px; }
     .pasos::before { content:''; position:absolute; top:40px; left:10%; width:0; height:1px; background:linear-gradient(90deg,var(--red),rgba(204,0,0,.05)); opacity:0; transition:width 1.4s cubic-bezier(.4,0,.2,1),opacity .6s ease; z-index:0; }
@@ -137,7 +137,7 @@
     .s-lbl { font-size:.76rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.72); }
 
     /* ── PROGRAMAS ── */
-    #programas { position:relative; padding:120px 0; overflow:hidden; }
+    #programas { position:relative; padding:96px 0; overflow:hidden; }
     .vid-bg { position:absolute; inset:0; z-index:0; }
     .vid-bg video { width:100%; height:100%; object-fit:cover; }
     .vid-bg::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,.84); }
@@ -162,7 +162,7 @@
     .cl-sep { width:4px; height:4px; border-radius:50%; background:rgba(204,0,0,.38); flex-shrink:0; }
 
     /* ── PRECIOS ── */
-    #precios { position:relative; padding:120px 0 160px; overflow:hidden; background:var(--bg); }
+    #precios { position:relative; padding:96px 0 120px; overflow:hidden; background:var(--bg); }
     .deco { position:absolute; bottom:-40px; left:50%; transform:translateX(-50%); font-family:var(--font-d); font-size:18vw; line-height:1; color:transparent; -webkit-text-stroke:1px rgba(204,0,0,.06); white-space:nowrap; pointer-events:none; user-select:none; will-change:transform; z-index:0; }
     .pc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; position:relative; z-index:1; }
     .pc { background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); padding:36px 28px; text-align:center; position:relative; overflow:hidden; transition:transform .3s,border-color .3s; will-change:transform; }
@@ -181,7 +181,7 @@
     .btn-pc:hover { background:var(--red); border-color:var(--red); color:#fff; transform:translateY(-2px); }
 
     /* ── FUNDADOR ── */
-    #fundador { padding:120px 0; background:var(--bg2); }
+    #fundador { padding:96px 0; background:var(--bg2); }
     .f-grid { display:grid; grid-template-columns:1fr 1.4fr; gap:96px; align-items:center; }
     .f-wrap { position:relative; }
     .f-img  { width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:var(--r); }
@@ -196,10 +196,10 @@
     .f-firma { font-family:'Cormorant Garamond', Georgia, serif; font-size:1.7rem; font-style:italic; color:var(--muted); opacity:.55; }
 
     /* ── CTA FINAL ── */
-    #cta-final { position:relative; padding:160px 0; overflow:hidden; text-align:center; background:var(--bg); }
+    #cta-final { position:relative; padding:120px 0; overflow:hidden; text-align:center; background:var(--bg); }
     .cta-glow { position:absolute; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(204,0,0,.18),rgba(204,0,0,.05) 50%,transparent 70%); left:50%; top:50%; transform:translate(-50%,-50%); animation:glowPulse 6s ease-in-out infinite; z-index:0; pointer-events:none; }
     .cta-body { position:relative; z-index:1; }
-    .cta-h { font-family:var(--font-d); font-size:clamp(3rem,7vw,6rem); line-height:.93; letter-spacing:.02em; color:var(--text); margin:14px auto 22px; max-width:800px; }
+    .cta-h { font-family:var(--font-d); font-size:clamp(2.8rem,5.5vw,5rem); line-height:.93; letter-spacing:.02em; color:var(--text); margin:14px auto 22px; max-width:800px; }
     .cta-h.rev { filter:blur(10px); transform:translateY(24px) scale(.95); transition:opacity .9s,transform .9s,filter .9s; }
     .cta-h.rev.vis { filter:blur(0); transform:none; }
     .cta-h em { color:var(--red); font-style:normal; }
@@ -663,7 +663,10 @@
       </div>
       <div class="ft-bottom">
         <p class="ft-copy">© 2024 Probasket · Academia de Basketball · Veracruz, México</p>
-        <span class="ft-badge">TAMOV-P25 · 25 años</span>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <span class="ft-badge">TAMOV-P25 · 25 años</span>
+          <a href="https://studio-29-web.vercel.app/" target="_blank" rel="noopener noreferrer" style="font-size:.72rem;color:rgba(245,245,245,.28);letter-spacing:.08em;transition:color .2s;" onmouseover="this.style.color='rgba(245,245,245,.65)'" onmouseout="this.style.color='rgba(245,245,245,.28)'">Powered by Studio 29</a>
+        </div>
       </div>
     </div>
   </footer>
