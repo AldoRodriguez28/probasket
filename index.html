@@ -94,8 +94,8 @@
     /* ── KINETIC ── */
     #kinetic { height:320vh; overflow:clip; background:var(--bg); position:relative; }
     .k-scene { position:sticky; top:0; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .k-bg { font-family:var(--font-d); font-size:18vw; line-height:.85; color:transparent; -webkit-text-stroke:1px rgba(245,245,245,.1); position:absolute; text-align:center; will-change:font-size,opacity; user-select:none; pointer-events:none; }
-    .k-fg { font-family:var(--font-d); font-size:clamp(2rem,5vw,3.5rem); letter-spacing:.1em; color:var(--text); text-align:center; z-index:2; max-width:700px; padding:0 20px; line-height:1.2; }
+    .k-bg { font-family:var(--font-d); font-size:18vw; line-height:.85; color:transparent; -webkit-text-stroke:1px rgba(245,245,245,.18); position:absolute; text-align:center; will-change:font-size,opacity; user-select:none; pointer-events:none; }
+    .k-fg { font-family:var(--font-d); font-size:clamp(2rem,5vw,3.5rem); letter-spacing:.1em; color:var(--text); text-align:center; z-index:2; max-width:700px; padding:0 20px; line-height:1.2; will-change:transform,opacity,filter; transform:scale(1.45); filter:blur(10px); opacity:0; transform-origin:center center; }
     .k-fg span { display:block; color:var(--red); }
 
     /* ── PROBLEMA ── */
@@ -754,18 +754,26 @@
       sp.style.background=`radial-gradient(600px at ${e.clientX}px ${e.clientY}px,rgba(27,75,138,.08),transparent 70%)`;
     });
 
-    // KINETIC TYPOGRAPHY
+    // KINETIC TYPOGRAPHY — zoom-out + blur-clear sincronizado con scroll
     const ks=document.getElementById('kinetic');
     const kbg=document.getElementById('kbg');
+    const kfg=document.querySelector('.k-fg');
     const mob=()=>window.innerWidth<=767;
-    window.addEventListener('scroll',()=>{
+    function kUpdate(){
       const r=ks.getBoundingClientRect();
       if(r.top>window.innerHeight||r.bottom<0) return;
       const prog=Math.max(0,Math.min(1,-r.top/(ks.offsetHeight-window.innerHeight)));
+      // Fondo: crece 18vw → 60vw
       const sv=mob()?11:18, ev=mob()?35:60;
       kbg.style.fontSize=(sv+(ev-sv)*prog)+'vw';
-      kbg.style.opacity=(.04+prog*.1).toString();
-    },{passive:true});
+      kbg.style.opacity=(.04+prog*.18).toString();
+      // Frente: zoom-out 1.45→1 + blur 10px→0 + fade 0→1
+      kfg.style.transform=`scale(${1.45-prog*0.45})`;
+      kfg.style.filter=`blur(${(1-prog)*10}px)`;
+      kfg.style.opacity=(0.1+prog*0.9).toString();
+    }
+    window.addEventListener('scroll',kUpdate,{passive:true});
+    kUpdate();
 
     // LÍNEA CONECTORA
     const pasosEl=document.getElementById('pasos');
