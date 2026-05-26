@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Probasket — Academia de Basketball · Veracruz</title>
+  <meta name="description" content="Academia de basketball en Veracruz con metodología TAMOV-P25. Formamos atletas completos y ciudadanos excepcionales desde los 4 años.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    :root {
+      --red: #CC0000;
+      --red-dim: rgba(204,0,0,0.12);
+      --red-glow: rgba(204,0,0,0.25);
+      --bg: #0A0A0A;
+      --bg2: #111111;
+      --bg3: #161616;
+      --text: #F5F5F5;
+      --muted: rgba(245,245,245,0.5);
+      --border: rgba(245,245,245,0.08);
+      --ease: cubic-bezier(0.4,0,0.2,1);
+      --font-d: 'Bebas Neue', sans-serif;
+      --font-b: 'Space Grotesk', sans-serif;
+      --r: 12px;
+      --w: 1240px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family:var(--font-b); background:var(--bg); color:var(--text); cursor:none; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+    a { color:inherit; text-decoration:none; }
+    img, video { max-width:100%; display:block; }
+    .container { max-width:var(--w); margin:0 auto; padding:0 40px; }
+
+    /* ── CURSOR ── */
+    .cur-dot, .cur-ring { position:fixed; top:0; left:0; border-radius:50%; pointer-events:none; z-index:9999; will-change:transform; }
+    .cur-dot  { width:10px; height:10px; background:var(--red); transition:width .2s,height .2s; }
+    .cur-ring { width:36px; height:36px; border:1.5px solid rgba(204,0,0,.55); z-index:9998; transition:width .3s,height .3s,border-color .3s; }
+    .cur-dot.on  { width:6px; height:6px; }
+    .cur-ring.on { width:48px; height:48px; border-color:var(--red); }
+
+    /* ── PROGRESS BAR ── */
+    #pb { position:fixed; top:0; left:0; height:2px; width:0; background:linear-gradient(90deg,var(--red),#FF4444); z-index:10000; will-change:width; }
+
+    /* ── NAV ── */
+    nav { position:fixed; top:0; left:0; right:0; z-index:1000; padding:20px 40px; display:flex; align-items:center; justify-content:space-between; opacity:0; transition:padding .4s var(--ease),background .4s var(--ease),border-bottom .4s var(--ease),opacity .6s ease; }
+    nav.vis { opacity:1; }
+    nav.sc  { padding:12px 40px; background:rgba(10,10,10,.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); }
+    .nav-logo img { height:34px; }
+    .nav-links { display:flex; gap:28px; align-items:center; }
+    .nav-links a { font-size:.82rem; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); transition:color .2s; }
+    .nav-links a:hover { color:var(--text); }
+    .nav-cta { background:var(--red)!important; color:#fff!important; padding:10px 22px; border-radius:6px; font-weight:700!important; transition:background .2s,transform .2s!important; }
+    .nav-cta:hover { background:#aa0000!important; transform:translateY(-1px); }
+    .nav-tog { display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; }
+    .nav-tog span { display:block; width:24px; height:2px; background:var(--text); border-radius:2px; }
+
+    /* ── MOBILE MENU ── */
+    .m-menu { display:none; position:fixed; inset:0; background:rgba(10,10,10,.97); backdrop-filter:blur(20px); z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:32px; }
+    .m-menu.on { display:flex; }
+    .m-menu a { font-family:var(--font-d); font-size:2.5rem; letter-spacing:.1em; text-transform:uppercase; transition:color .2s; }
+    .m-menu a:hover { color:var(--red); }
+    .m-close { position:absolute; top:20px; right:24px; background:none; border:none; color:var(--text); font-size:1.6rem; cursor:pointer; }
+
+    /* ── REVEAL ── */
+    .rev { opacity:0; transform:translateY(32px); transition:opacity .7s var(--ease),transform .7s var(--ease); }
+    .rev.vis { opacity:1; transform:none; }
+    .d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s} .d4{transition-delay:.4s} .d5{transition-delay:.5s}
+
+    /* ── HERO ── */
+    #hero { position:relative; height:100vh; min-height:700px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .h-vid { position:absolute; inset:0; z-index:0; }
+    .h-vid video { width:100%; height:100%; object-fit:cover; }
+    .h-vid::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(0,0,0,.8),rgba(10,0,0,.6),rgba(0,0,0,.75)); }
+    #h-canvas { position:absolute; inset:0; z-index:1; pointer-events:none; }
+    .h-body { position:relative; z-index:2; text-align:center; padding:0 20px; max-width:920px; }
+    .eyebrow { font-size:.76rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--red); display:block; margin-bottom:16px; }
+    .h-eyebrow { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:24px; }
+    .h-eyebrow span { font-size:.76rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--red); }
+    .h-eyebrow::before,.h-eyebrow::after { content:''; flex:1; max-width:48px; height:1px; background:var(--red); opacity:.45; }
+    .h1 { font-family:var(--font-d); font-size:clamp(2.8rem,8vw,7rem); line-height:.93; letter-spacing:.02em; color:var(--text); margin-bottom:24px; }
+    .h1 em { color:var(--red); font-style:normal; }
+    .h-sub { font-size:clamp(.88rem,2vw,1.05rem); color:var(--muted); margin-bottom:40px; letter-spacing:.04em; line-height:1.8; }
+    .h-sub strong { color:var(--text); }
+    .h-ctas { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+    .btn-p { display:inline-flex; align-items:center; gap:8px; background:var(--red); color:#fff; font-family:var(--font-b); font-size:.92rem; font-weight:700; padding:16px 32px; border-radius:8px; letter-spacing:.04em; transition:background .2s,transform .2s,box-shadow .2s; will-change:transform; }
+    .btn-p:hover { background:#aa0000; transform:translateY(-2px); box-shadow:0 8px 32px rgba(204,0,0,.35); }
+    .btn-g { display:inline-flex; align-items:center; gap:8px; background:transparent; color:var(--text); font-family:var(--font-b); font-size:.92rem; font-weight:500; padding:16px 32px; border-radius:8px; border:1px solid var(--border); letter-spacing:.04em; transition:border-color .2s,background .2s,transform .2s; }
+    .btn-g:hover { border-color:rgba(245,245,245,.22); background:rgba(245,245,245,.05); transform:translateY(-2px); }
+    .scroll-hint { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); z-index:2; display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--muted); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; animation:bounce 2s ease-in-out infinite; }
+    @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+
+    /* ── KINETIC ── */
+    #kinetic { height:320vh; overflow:clip; background:var(--bg); position:relative; }
+    .k-scene { position:sticky; top:0; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .k-bg { font-family:var(--font-d); font-size:18vw; line-height:.85; color:transparent; -webkit-text-stroke:1px rgba(245,245,245,.1); position:absolute; text-align:center; will-change:font-size,opacity; user-select:none; pointer-events:none; }
+    .k-fg { font-family:var(--font-d); font-size:clamp(2rem,5vw,3.5rem); letter-spacing:.1em; color:var(--text); text-align:center; z-index:2; max-width:700px; padding:0 20px; line-height:1.2; }
+    .k-fg span { display:block; color:var(--red); }
+
+    /* ── PROBLEMA ── */
+    #problema { position:relative; padding:120px 0; background:var(--bg2); overflow:hidden; }
+    #spotlight { position:absolute; inset:0; pointer-events:none; z-index:0; }
+    .sec-head { text-align:center; margin-bottom:72px; position:relative; z-index:1; }
+    .sec-title { font-family:var(--font-d); font-size:clamp(2.4rem,5vw,4.5rem); line-height:1; letter-spacing:.02em; color:var(--text); }
+    .sec-sub { font-size:.95rem; line-height:1.8; color:var(--muted); max-width:520px; margin:18px auto 0; }
+    .p-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; max-width:880px; margin:0 auto; position:relative; z-index:1; }
+    .p-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); padding:28px; display:flex; gap:18px; align-items:flex-start; transition:border-color .3s,transform .3s; }
+    .p-card:hover { border-color:rgba(204,0,0,.25); transform:translateY(-4px); }
+    .p-icon { width:42px; height:42px; background:var(--red-dim); border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--red); }
+    .p-card h3 { font-family:var(--font-d); font-size:1.3rem; letter-spacing:.04em; color:var(--text); margin-bottom:7px; }
+    .p-card p  { font-size:.87rem; line-height:1.75; color:var(--muted); }
+    .p-vs { text-align:center; margin:52px 0 0; position:relative; z-index:1; }
+    .p-vs p { font-size:.82rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
+    .p-vs strong { display:block; font-family:var(--font-d); font-size:clamp(1.8rem,4vw,2.8rem); color:var(--red); letter-spacing:.06em; margin-top:6px; }
+
+    /* ── SISTEMA ── */
+    #sistema { position:relative; padding:120px 0; overflow:hidden; }
+    #sistema::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(204,0,0,.06),rgba(20,40,80,.04),rgba(204,0,0,.06)); background-size:300% 300%; animation:gradShift 14s ease-in-out infinite; z-index:0; }
+    .pasos { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; position:relative; z-index:1; margin-top:16px; }
+    .pasos::before { content:''; position:absolute; top:40px; left:10%; width:0; height:1px; background:linear-gradient(90deg,var(--red),rgba(204,0,0,.05)); opacity:0; transition:width 1.4s cubic-bezier(.4,0,.2,1),opacity .6s ease; z-index:0; }
+    .pasos.lv::before { width:68%; opacity:.22; }
+    .paso { text-align:center; position:relative; z-index:1; }
+    .paso-n { width:72px; height:72px; border-radius:50%; border:1.5px solid rgba(204,0,0,.3); background:var(--red-dim); display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-family:var(--font-d); font-size:1.8rem; color:var(--red); will-change:box-shadow; }
+    .paso-n.vis { animation:pulsarGlow 2.8s ease-in-out infinite; }
+    .paso:nth-child(1) .paso-n.vis { animation-delay:0s; }
+    .paso:nth-child(2) .paso-n.vis { animation-delay:.65s; }
+    .paso:nth-child(3) .paso-n.vis { animation-delay:1.3s; }
+    .paso-badge { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--red); background:var(--red-dim); border:1px solid rgba(204,0,0,.2); padding:4px 12px; border-radius:20px; margin-bottom:14px; }
+    .paso h3 { font-family:var(--font-d); font-size:1.5rem; letter-spacing:.05em; color:var(--text); margin-bottom:10px; }
+    .paso p  { font-size:.87rem; line-height:1.8; color:var(--muted); max-width:270px; margin:0 auto; }
+
+    /* ── STATS ── */
+    #stats { padding:80px 0; background:var(--red); }
+    .s-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:40px; text-align:center; }
+    .s-num { font-family:var(--font-d); font-size:clamp(2.5rem,5vw,4rem); letter-spacing:.02em; color:#fff; line-height:1; margin-bottom:6px; }
+    .s-lbl { font-size:.76rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.72); }
+
+    /* ── PROGRAMAS ── */
+    #programas { position:relative; padding:120px 0; overflow:hidden; }
+    .vid-bg { position:absolute; inset:0; z-index:0; }
+    .vid-bg video { width:100%; height:100%; object-fit:cover; }
+    .vid-bg::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,.84); }
+    .pr-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; position:relative; z-index:1; }
+    .pr-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; transition:transform .3s,border-color .3s; will-change:transform; }
+    .pr-card:hover { transform:translateY(-6px); border-color:rgba(204,0,0,.3); }
+    .pr-img { width:100%; height:210px; object-fit:cover; }
+    .pr-body { padding:24px; }
+    .pr-ages { font-size:.72rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--red); margin-bottom:8px; }
+    .pr-body h3 { font-family:var(--font-d); font-size:1.6rem; letter-spacing:.04em; color:var(--text); margin-bottom:10px; }
+    .pr-body p  { font-size:.86rem; line-height:1.7; color:var(--muted); margin-bottom:16px; }
+    .tags { display:flex; gap:6px; flex-wrap:wrap; }
+    .tag { font-size:.7rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:3px 9px; border-radius:4px; background:rgba(245,245,245,.05); border:1px solid var(--border); color:var(--muted); }
+
+    /* ── CLIENTES ── */
+    #clientes { padding:72px 0; background:var(--bg); overflow:hidden; }
+    .cl-lbl { text-align:center; font-size:.72rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:36px; }
+    .mq-wrap { overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent); mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent); }
+    .mq-track { display:flex; align-items:center; width:max-content; animation:marqueeScroll 55s linear infinite; will-change:transform; }
+    .mq-wrap:hover .mq-track { animation-play-state:paused; }
+    .cl-chip { font-family:var(--font-d); font-weight:800; font-size:.95rem; letter-spacing:.14em; text-transform:uppercase; color:rgba(245,245,245,.17); padding:0 56px; white-space:nowrap; }
+    .cl-sep { width:4px; height:4px; border-radius:50%; background:rgba(204,0,0,.38); flex-shrink:0; }
+
+    /* ── PRECIOS ── */
+    #precios { position:relative; padding:120px 0 160px; overflow:hidden; background:var(--bg); }
+    .deco { position:absolute; bottom:-40px; left:50%; transform:translateX(-50%); font-family:var(--font-d); font-size:18vw; line-height:1; color:transparent; -webkit-text-stroke:1px rgba(204,0,0,.06); white-space:nowrap; pointer-events:none; user-select:none; will-change:transform; z-index:0; }
+    .pc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; position:relative; z-index:1; }
+    .pc { background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); padding:36px 28px; text-align:center; position:relative; overflow:hidden; transition:transform .3s,border-color .3s; will-change:transform; }
+    .pc:hover { transform:translateY(-6px); }
+    .pc.feat { border-color:rgba(204,0,0,.4); background:linear-gradient(145deg,#1a0000,#160808); }
+    .pc.feat::before { content:''; position:absolute; inset:0; background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.07) 50%,transparent 62%); background-size:220% 100%; animation:featShimmer 4.5s linear infinite; }
+    .pc-badge { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#fff; background:var(--red); padding:4px 13px; border-radius:20px; margin-bottom:20px; }
+    .pc h3 { font-family:var(--font-d); font-size:2rem; letter-spacing:.04em; color:var(--text); margin-bottom:6px; }
+    .pc-ages { font-size:.78rem; color:var(--muted); letter-spacing:.08em; margin-bottom:24px; }
+    .pc-list { list-style:none; margin-bottom:28px; text-align:left; }
+    .pc-list li { display:flex; gap:9px; align-items:flex-start; font-size:.86rem; line-height:1.7; color:var(--muted); padding:5px 0; border-bottom:1px solid var(--border); }
+    .pc-list li:last-child { border-bottom:none; }
+    .ck { color:var(--red); flex-shrink:0; margin-top:3px; }
+    .btn-pc { display:block; width:100%; padding:13px; border-radius:8px; font-family:var(--font-b); font-size:.88rem; font-weight:600; letter-spacing:.05em; border:1.5px solid var(--border); background:transparent; color:var(--text); cursor:pointer; transition:all .2s; }
+    .pc.feat .btn-pc { background:var(--red); border-color:var(--red); color:#fff; }
+    .btn-pc:hover { background:var(--red); border-color:var(--red); color:#fff; transform:translateY(-2px); }
+
+    /* ── FUNDADOR ── */
+    #fundador { padding:120px 0; background:var(--bg2); }
+    .f-grid { display:grid; grid-template-columns:1fr 1.4fr; gap:96px; align-items:center; }
+    .f-wrap { position:relative; }
+    .f-img  { width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:var(--r); }
+    .f-acc  { position:absolute; top:20px; left:-20px; width:100%; height:100%; border:1.5px solid rgba(204,0,0,.28); border-radius:var(--r); z-index:-1; }
+    .f-badge { position:absolute; top:20px; right:20px; font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#fff; background:var(--red); padding:5px 13px; border-radius:20px; }
+    .f-name { font-family:var(--font-d); font-size:clamp(2.4rem,4vw,3.4rem); letter-spacing:.03em; color:var(--text); margin:14px 0 6px; }
+    .f-rol  { font-size:.82rem; color:var(--red); letter-spacing:.1em; text-transform:uppercase; font-weight:700; margin-bottom:22px; }
+    .f-bio  { font-size:.96rem; line-height:1.95; color:var(--muted); margin-bottom:36px; }
+    .f-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:28px; }
+    .f-sn { font-family:var(--font-d); font-size:2.4rem; letter-spacing:.02em; color:var(--red); line-height:1; }
+    .f-sl { font-size:.74rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; line-height:1.4; margin-top:4px; }
+    .f-firma { font-family:'Cormorant Garamond', Georgia, serif; font-size:1.7rem; font-style:italic; color:var(--muted); opacity:.55; }
+
+    /* ── CTA FINAL ── */
+    #cta-final { position:relative; padding:160px 0; overflow:hidden; text-align:center; background:var(--bg); }
+    .cta-glow { position:absolute; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(204,0,0,.18),rgba(204,0,0,.05) 50%,transparent 70%); left:50%; top:50%; transform:translate(-50%,-50%); animation:glowPulse 6s ease-in-out infinite; z-index:0; pointer-events:none; }
+    .cta-body { position:relative; z-index:1; }
+    .cta-h { font-family:var(--font-d); font-size:clamp(3rem,7vw,6rem); line-height:.93; letter-spacing:.02em; color:var(--text); margin:14px auto 22px; max-width:800px; }
+    .cta-h.rev { filter:blur(10px); transform:translateY(24px) scale(.95); transition:opacity .9s,transform .9s,filter .9s; }
+    .cta-h.rev.vis { filter:blur(0); transform:none; }
+    .cta-h em { color:var(--red); font-style:normal; }
+    .cta-sub { font-size:.96rem; line-height:1.85; color:var(--muted); max-width:480px; margin:0 auto 44px; }
+    .cta-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+    .btn-wa { display:inline-flex; align-items:center; gap:10px; background:#25D366; color:#fff; font-family:var(--font-b); font-size:.96rem; font-weight:700; padding:17px 36px; border-radius:8px; letter-spacing:.04em; transition:background .2s,transform .2s,box-shadow .2s; will-change:transform; }
+    .btn-wa:hover { background:#1fba58; transform:translateY(-2px); box-shadow:0 8px 32px rgba(37,211,102,.3); }
+
+    /* ── FOOTER ── */
+    footer { padding:60px 0 36px; background:#060606; border-top:1px solid var(--border); }
+    .ft-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:60px; margin-bottom:44px; }
+    .ft-logo img { height:30px; margin-bottom:14px; }
+    .ft-desc { font-size:.86rem; line-height:1.85; color:var(--muted); }
+    .ft-col h4 { font-size:.72rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text); margin-bottom:18px; }
+    .ft-col ul { list-style:none; }
+    .ft-col ul li { margin-bottom:9px; }
+    .ft-col ul li a { font-size:.86rem; color:var(--muted); transition:color .2s; }
+    .ft-col ul li a:hover { color:var(--text); }
+    .ft-bottom { padding-top:28px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+    .ft-copy  { font-size:.78rem; color:var(--muted); }
+    .ft-badge { font-size:.72rem; color:rgba(204,0,0,.55); letter-spacing:.1em; text-transform:uppercase; font-weight:700; }
+
+    /* ── KEYFRAMES ── */
+    @keyframes gradShift {
+      0%,100%{ background-position:0% 0% }
+      40%    { background-position:100% 0% }
+      70%    { background-position:100% 100% }
+    }
+    @keyframes pulsarGlow {
+      0%,100%{ box-shadow:0 0 0 0 rgba(204,0,0,0); border-color:rgba(204,0,0,.3); }
+      50%    { box-shadow:0 0 0 7px rgba(204,0,0,.1),0 0 28px rgba(204,0,0,.18); border-color:rgba(204,0,0,.65); }
+    }
+    @keyframes featShimmer {
+      0%  { background-position:160% 0 }
+      100%{ background-position:-160% 0 }
+    }
+    @keyframes glowPulse {
+      0%,100%{ transform:translate(-50%,-50%) scale(1);    opacity:.65; }
+      50%    { transform:translate(-50%,-50%) scale(1.22); opacity:1; }
+    }
+    @keyframes marqueeScroll {
+      from{ transform:translateX(0) }
+      to  { transform:translateX(-50%) }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:1024px) {
+      .f-grid { gap:56px; }
+      .pasos  { gap:32px; }
+    }
+    @media (max-width:768px) {
+      .container { padding:0 20px; }
+      nav { padding:14px 20px; }
+      nav.sc { padding:10px 20px; }
+      .nav-links { display:none; }
+      .nav-tog   { display:flex; }
+      .p-grid    { grid-template-columns:1fr; }
+      .pasos     { grid-template-columns:1fr; gap:28px; }
+      .pasos::before { display:none; }
+      .s-grid    { grid-template-columns:repeat(2,1fr); gap:28px; }
+      .pr-grid   { grid-template-columns:1fr; }
+      .pc-grid   { grid-template-columns:1fr; }
+      .f-grid    { grid-template-columns:1fr; gap:40px; }
+      .f-acc     { display:none; }
+      .ft-grid   { grid-template-columns:1fr; gap:36px; }
+      body { cursor:auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cur-dot"  id="cd" aria-hidden="true"></div>
+  <div class="cur-ring" id="cr" aria-hidden="true"></div>
+  <div id="pb" role="progressbar" aria-label="Progreso de lectura"></div>
+
+  <!-- MOBILE MENU -->
+  <div class="m-menu" id="mm" role="dialog" aria-label="Menú">
+    <button class="m-close" id="mc" aria-label="Cerrar">✕</button>
+    <a href="#problema" onclick="closeMM()">Metodología</a>
+    <a href="#programas" onclick="closeMM()">Programas</a>
+    <a href="#precios" onclick="closeMM()">Inscripción</a>
+    <a href="#cta-final" onclick="closeMM()" style="color:var(--red)">Evaluación Gratuita</a>
+  </div>
+
+  <!-- NAV -->
+  <nav id="nav" role="navigation" aria-label="Navegación principal">
+    <div class="nav-logo">
+      <img src="assets/logo.png" alt="Probasket — Academia de Basketball Veracruz">
+    </div>
+    <div class="nav-links">
+      <a href="#problema">Metodología</a>
+      <a href="#sistema">TAMOV-P25</a>
+      <a href="#programas">Programas</a>
+      <a href="#precios">Inscripción</a>
+      <a href="#cta-final" class="nav-cta">Evaluación Gratuita</a>
+    </div>
+    <button class="nav-tog" id="nt" aria-label="Menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero" aria-label="Sección principal">
+    <div class="h-vid">
+      <video autoplay muted loop playsinline preload="auto" aria-hidden="true">
+        <source src="assets/videos/hero-bg.mp4" type="video/mp4">
+      </video>
+    </div>
+    <canvas id="h-canvas" aria-hidden="true"></canvas>
+    <div class="h-body">
+      <div class="h-eyebrow"><span>Probasket · Academia · Veracruz</span></div>
+      <h1 class="h1">
+        Aquí no entrenamos niños.<br>
+        Formamos a los <em>mejores atletas</em><br>
+        de Veracruz.
+      </h1>
+      <p class="h-sub">
+        <strong>Sistema TAMOV-P25</strong> · 25 años de metodología científica ·
+        Desarrollo integral de los 4 a los 21 años
+      </p>
+      <div class="h-ctas">
+        <a href="#cta-final" class="btn-p">
+          <i data-lucide="calendar-check" aria-hidden="true"></i>
+          Agenda tu Evaluación Gratuita
+        </a>
+        <a href="#sistema" class="btn-g">
+          <i data-lucide="play-circle" aria-hidden="true"></i>
+          Conocer el Sistema
+        </a>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">
+      <span>Scroll</span>
+      <i data-lucide="chevron-down"></i>
+    </div>
+  </section>
+
+  <!-- KINETIC -->
+  <section id="kinetic" aria-hidden="true">
+    <div class="k-scene">
+      <div class="k-bg" id="kbg">PROBASKET</div>
+      <div class="k-fg">
+        EL SISTEMA QUE<br><span>FORJA CAMPEONES</span>DESDE LOS 4 AÑOS
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEMA -->
+  <section id="problema" aria-labelledby="prob-title">
+    <div id="spotlight" aria-hidden="true"></div>
+    <div class="container">
+      <div class="sec-head">
+        <span class="eyebrow rev">El problema con las academias genéricas</span>
+        <h2 class="sec-title rev d1" id="prob-title">No todas las academias<br>son iguales.</h2>
+        <p class="sec-sub rev d2">La mayoría improvisa. Sin metodología, sin seguimiento, sin resultados reales. Tu hijo merece más.</p>
+      </div>
+      <div class="p-grid">
+        <div class="p-card rev d1">
+          <div class="p-icon"><i data-lucide="x-circle" aria-hidden="true"></i></div>
+          <div>
+            <h3>Sin Metodología Probada</h3>
+            <p>Entrenamientos improvisados sin progresión científica ni evaluaciones periódicas de rendimiento real.</p>
+          </div>
+        </div>
+        <div class="p-card rev d2">
+          <div class="p-icon"><i data-lucide="user-x" aria-hidden="true"></i></div>
+          <div>
+            <h3>Sin Seguimiento Real</h3>
+            <p>Grupos masivos donde cada atleta es un número. Sin perfil individual ni evolución documentada.</p>
+          </div>
+        </div>
+        <div class="p-card rev d3">
+          <div class="p-icon"><i data-lucide="trending-down" aria-hidden="true"></i></div>
+          <div>
+            <h3>Sin Camino a Competir</h3>
+            <p>Años entrenando sin torneos reales. Sin conexión con selecciones estatales ni proyección nacional.</p>
+          </div>
+        </div>
+        <div class="p-card rev d4">
+          <div class="p-icon"><i data-lucide="heart-off" aria-hidden="true"></i></div>
+          <div>
+            <h3>Solo Técnica, Nada Más</h3>
+            <p>Entrenan el cuerpo e ignoran la mente, el carácter y los valores. El basketball forma personas, no solo atletas.</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-vs">
+        <p>En Probasket lo hacemos diferente</p>
+        <strong>SISTEMA TAMOV-P25</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- SISTEMA -->
+  <section id="sistema" aria-labelledby="sis-title">
+    <div class="container" style="position:relative;z-index:1">
+      <div class="sec-head">
+        <span class="eyebrow rev">Metodología TAMOV-P25</span>
+        <h2 class="sec-title rev d1" id="sis-title">El sistema que cambia<br>atletas para siempre.</h2>
+        <p class="sec-sub rev d2">25 años de experiencia avalada nacional e internacionalmente. Tres etapas que transforman talento en excelencia.</p>
+      </div>
+      <div class="pasos" id="pasos">
+        <div class="paso rev d1">
+          <div class="paso-n" aria-hidden="true">01</div>
+          <span class="paso-badge">Evaluación</span>
+          <h3>TAMOV Assessment</h3>
+          <p>Evaluamos el talento real — capacidades físicas, técnicas, mentales y valores. El programa correcto, desde el día uno.</p>
+        </div>
+        <div class="paso rev d2">
+          <div class="paso-n" aria-hidden="true">02</div>
+          <span class="paso-badge">Plan Individual</span>
+          <h3>Plataforma RETO</h3>
+          <p>Perfil deportivo único por atleta. Metas claras, progresión documentada, retroalimentación constante a la familia.</p>
+        </div>
+        <div class="paso rev d3">
+          <div class="paso-n" aria-hidden="true">03</div>
+          <span class="paso-badge">Competencia Real</span>
+          <h3>Semillero Nacional</h3>
+          <p>Torneos estatales y nacionales. Conexión directa con selecciones. El camino de Veracruz al alto rendimiento.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section id="stats" aria-label="Impacto Probasket">
+    <div class="container">
+      <div class="s-grid">
+        <div class="rev d1"><div class="s-num">25+</div><div class="s-lbl">Años de Experiencia</div></div>
+        <div class="rev d2"><div class="s-num">500+</div><div class="s-lbl">Atletas Formados</div></div>
+        <div class="rev d3"><div class="s-num">4–21</div><div class="s-lbl">Años de Edad</div></div>
+        <div class="rev d4"><div class="s-num">100%</div><div class="s-lbl">Metodología Avalada</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAMAS -->
+  <section id="programas" aria-labelledby="prog-title">
+    <div class="vid-bg">
+      <video autoplay muted loop playsinline preload="auto" aria-hidden="true">
+        <source src="assets/videos/seccion-bg.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="container" style="position:relative;z-index:1">
+      <div class="sec-head">
+        <span class="eyebrow rev">Programas de Formación</span>
+        <h2 class="sec-title rev d1" id="prog-title">Un programa para<br>cada etapa del atleta.</h2>
+      </div>
+      <div class="pr-grid">
+        <div class="pr-card rev d1">
+          <img src="assets/images/contexto-problema.jpg" alt="Programa Iniciación basketball 4 a 8 años" class="pr-img" loading="lazy">
+          <div class="pr-body">
+            <p class="pr-ages">4 — 8 AÑOS</p>
+            <h3>Iniciación</h3>
+            <p>Fundamentos, coordinación y amor por el deporte. Formamos el carácter desde el primer dribble.</p>
+            <div class="tags">
+              <span class="tag">Fundamentos</span>
+              <span class="tag">Coordinación</span>
+              <span class="tag">Valores</span>
+            </div>
+          </div>
+        </div>
+        <div class="pr-card rev d2">
+          <img src="assets/images/solucion-resultado.jpg" alt="Programa Formación basketball 9 a 14 años" class="pr-img" loading="lazy">
+          <div class="pr-body">
+            <p class="pr-ages">9 — 14 AÑOS</p>
+            <h3>Formación</h3>
+            <p>Técnica avanzada, táctica y liderazgo. Seguimiento individual en la plataforma RETO.</p>
+            <div class="tags">
+              <span class="tag">Técnica Avanzada</span>
+              <span class="tag">Táctica</span>
+              <span class="tag">Liderazgo</span>
+            </div>
+          </div>
+        </div>
+        <div class="pr-card rev d3">
+          <img src="assets/images/hero-principal.jpg" alt="Programa Competencia basketball 15 a 21 años" class="pr-img" loading="lazy">
+          <div class="pr-body">
+            <p class="pr-ages">15 — 21 AÑOS</p>
+            <h3>Competencia</h3>
+            <p>Alto rendimiento, torneos nacionales y proyección a selecciones. El camino real hacia arriba.</p>
+            <div class="tags">
+              <span class="tag">Alto Rendimiento</span>
+              <span class="tag">Torneos</span>
+              <span class="tag">Selecciones</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLIENTES -->
+  <section id="clientes" aria-label="Torneos e instituciones asociadas">
+    <p class="cl-lbl">Instituciones y torneos donde competimos</p>
+    <div class="mq-wrap">
+      <div class="mq-track">
+        <span class="cl-chip">CONADE</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Liga Veracruzana</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Selección Veracruz</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Copa México Basketball</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Torneo Nacional FIBA</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Olimpiada Nacional</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Juegos Nacionales</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">SEC Basketball</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">CONADE</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Liga Veracruzana</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Selección Veracruz</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Copa México Basketball</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Torneo Nacional FIBA</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Olimpiada Nacional</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">Juegos Nacionales</span><span class="cl-sep" aria-hidden="true"></span>
+        <span class="cl-chip">SEC Basketball</span><span class="cl-sep" aria-hidden="true"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRECIOS -->
+  <section id="precios" aria-labelledby="prec-title">
+    <div class="deco" id="deco" aria-hidden="true">PROBASKET</div>
+    <div class="container">
+      <div class="sec-head" style="position:relative;z-index:1">
+        <span class="eyebrow rev">Inscripción</span>
+        <h2 class="sec-title rev d1" id="prec-title">Elige el programa<br>de tu atleta.</h2>
+        <p class="sec-sub rev d2" style="margin:18px auto 0">Primera evaluación sin costo. Te asignamos el programa correcto y cotizamos sin compromiso.</p>
+      </div>
+      <div class="pc-grid">
+        <div class="pc rev d1">
+          <h3>Iniciación</h3>
+          <p class="pc-ages">4 — 8 años</p>
+          <ul class="pc-list">
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Evaluación TAMOV inicial gratuita</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Perfil en plataforma RETO</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Entrenadores certificados</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Instalaciones techadas</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Reporte mensual para padres</li>
+          </ul>
+          <a href="#cta-final" class="btn-pc">Consultar Disponibilidad</a>
+        </div>
+        <div class="pc feat rev d2">
+          <span class="pc-badge">Más Popular</span>
+          <h3>Formación</h3>
+          <p class="pc-ages">9 — 14 años</p>
+          <ul class="pc-list">
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Todo lo de Iniciación</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Plan de rendimiento personalizado</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Torneos locales y estatales</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Seguimiento mental y valores</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Evaluaciones TAMOV trimestrales</li>
+          </ul>
+          <a href="#cta-final" class="btn-pc">Consultar Disponibilidad</a>
+        </div>
+        <div class="pc rev d3">
+          <h3>Competencia</h3>
+          <p class="pc-ages">15 — 21 años</p>
+          <ul class="pc-list">
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Todo lo de Formación</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Torneos estatales y nacionales</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Proyección a selecciones</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Análisis de rendimiento avanzado</li>
+            <li><i data-lucide="check" class="ck" size="14" aria-hidden="true"></i> Mentoría individual</li>
+          </ul>
+          <a href="#cta-final" class="btn-pc">Consultar Disponibilidad</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUNDADOR -->
+  <section id="fundador" aria-labelledby="fund-title">
+    <div class="container">
+      <div class="f-grid">
+        <div class="f-wrap rev">
+          <span class="f-badge">Fundador</span>
+          <img src="assets/images/solucion-resultado.jpg"
+               alt="Fundador y Director Técnico de Probasket"
+               class="f-img" loading="lazy">
+          <div class="f-acc" aria-hidden="true"></div>
+        </div>
+        <div class="rev d2">
+          <span class="eyebrow">La persona detrás del sistema</span>
+          <h2 class="f-name" id="fund-title">El Entrenador.</h2>
+          <p class="f-rol">Director Técnico · Veracruz, México</p>
+          <p class="f-bio">
+            Más de 25 años formando atletas y ciudadanos en Veracruz. Fundé Probasket con una convicción clara: el basketball es el vehículo, la formación integral es el destino.
+            <br><br>
+            El sistema TAMOV-P25 no nació en un libro — nació en la cancha, con cientos de atletas que hoy compiten a nivel estatal y nacional. No creo en las academias genéricas. Creo en los sistemas probados, en el trabajo individualizado y en que Veracruz tiene el talento para estar en el mapa del basketball nacional.
+          </p>
+          <div class="f-stats">
+            <div>
+              <div class="f-sn">25+</div>
+              <div class="f-sl">Años formando atletas</div>
+            </div>
+            <div>
+              <div class="f-sn">500+</div>
+              <div class="f-sl">Atletas graduados</div>
+            </div>
+            <div>
+              <div class="f-sn">3</div>
+              <div class="f-sl">Niveles de formación</div>
+            </div>
+          </div>
+          <p class="f-firma">El Entrenador</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section id="cta-final" aria-labelledby="cta-title">
+    <div class="cta-glow" aria-hidden="true"></div>
+    <div class="container cta-body">
+      <span class="eyebrow rev">¿Listo para empezar?</span>
+      <h2 class="cta-h rev d1" id="cta-title">
+        Tu mejor jugada<br>empieza <em>aquí.</em>
+      </h2>
+      <p class="cta-sub rev d2">
+        Agenda una evaluación gratuita. Analizamos el nivel de tu atleta, asignamos el programa correcto y explicamos el sistema TAMOV-P25. Sin compromiso.
+      </p>
+      <div class="cta-btns rev d3">
+        <a href="https://wa.me/522291000000?text=Hola%2C%20quiero%20agendar%20una%20evaluaci%C3%B3n%20gratuita%20en%20Probasket."
+           class="btn-wa" target="_blank" rel="noopener noreferrer"
+           aria-label="Agendar evaluación por WhatsApp">
+          <i data-lucide="message-circle" aria-hidden="true"></i>
+          Agenda por WhatsApp
+        </a>
+        <a href="#problema" class="btn-g">
+          <i data-lucide="arrow-up" aria-hidden="true"></i>
+          Ver el Sistema
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer role="contentinfo">
+    <div class="container">
+      <div class="ft-grid">
+        <div>
+          <div class="ft-logo"><img src="assets/logo.png" alt="Probasket logo" loading="lazy"></div>
+          <p class="ft-desc">Academia de basketball en Veracruz. Formamos atletas completos y ciudadanos excepcionales con el sistema TAMOV-P25.</p>
+        </div>
+        <div class="ft-col">
+          <h4>Programas</h4>
+          <ul>
+            <li><a href="#programas">Iniciación (4–8 años)</a></li>
+            <li><a href="#programas">Formación (9–14 años)</a></li>
+            <li><a href="#programas">Competencia (15–21 años)</a></li>
+            <li><a href="#sistema">Sistema TAMOV-P25</a></li>
+          </ul>
+        </div>
+        <div class="ft-col">
+          <h4>Contacto</h4>
+          <ul>
+            <li><a href="#cta-final">Evaluación Gratuita</a></li>
+            <li><a href="https://wa.me/522291000000" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
+            <li><a href="mailto:info@probasket.mx">info@probasket.mx</a></li>
+            <li><a href="#clientes">Torneos</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ft-bottom">
+        <p class="ft-copy">© 2024 Probasket · Academia de Basketball · Veracruz, México</p>
+        <span class="ft-badge">TAMOV-P25 · 25 años</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    // CURSOR
+    const cd = document.getElementById('cd');
+    const cr = document.getElementById('cr');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove', e => {
+      mx=e.clientX; my=e.clientY;
+      cd.style.transform=`translate(${mx-5}px,${my-5}px)`;
+    });
+    (function raf(){
+      rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+      cr.style.transform=`translate(${rx-18}px,${ry-18}px)`;
+      requestAnimationFrame(raf);
+    })();
+    document.querySelectorAll('a,button').forEach(el=>{
+      el.addEventListener('mouseenter',()=>{ cd.classList.add('on'); cr.classList.add('on'); });
+      el.addEventListener('mouseleave',()=>{ cd.classList.remove('on'); cr.classList.remove('on'); });
+    });
+
+    // PROGRESS BAR
+    const pb = document.getElementById('pb');
+    window.addEventListener('scroll',()=>{
+      pb.style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%';
+    },{passive:true});
+
+    // NAV
+    const nav = document.getElementById('nav');
+    setTimeout(()=>nav.classList.add('vis'),300);
+    window.addEventListener('scroll',()=>nav.classList.toggle('sc',window.scrollY>60),{passive:true});
+
+    // MOBILE MENU
+    const mm=document.getElementById('mm');
+    document.getElementById('nt').addEventListener('click',()=>{ mm.classList.add('on'); });
+    document.getElementById('mc').addEventListener('click',closeMM);
+    function closeMM(){ mm.classList.remove('on'); }
+
+    // SMOOTH SCROLL
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click',e=>{
+        const t=document.querySelector(a.getAttribute('href'));
+        if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
+      });
+    });
+
+    // REVEAL ON SCROLL
+    const ro=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('vis'); ro.unobserve(e.target); } });
+    },{threshold:.1});
+    document.querySelectorAll('.rev').forEach(el=>ro.observe(el));
+
+    // CANVAS PARTICLES
+    const cv=document.getElementById('h-canvas');
+    const cx=cv.getContext('2d');
+    let pts=[];
+    function rsz(){ cv.width=window.innerWidth; cv.height=window.innerHeight; }
+    rsz();
+    window.addEventListener('resize',rsz,{passive:true});
+    for(let i=0;i<90;i++) pts.push({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*2+1});
+    (function draw(){
+      cx.clearRect(0,0,cv.width,cv.height);
+      pts.forEach((p,i)=>{
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0||p.x>cv.width)  p.vx*=-1;
+        if(p.y<0||p.y>cv.height) p.vy*=-1;
+        cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        cx.fillStyle='rgba(232,80,60,.5)'; cx.fill();
+        for(let j=i+1;j<pts.length;j++){
+          const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
+          if(d<140){ cx.beginPath(); cx.moveTo(p.x,p.y); cx.lineTo(q.x,q.y);
+            cx.strokeStyle=`rgba(232,80,60,${(1-d/140)*.22})`; cx.lineWidth=.8; cx.stroke(); }
+        }
+      });
+      requestAnimationFrame(draw);
+    })();
+
+    // SPOTLIGHT
+    const sp=document.getElementById('spotlight');
+    document.getElementById('problema').addEventListener('mousemove',e=>{
+      sp.style.background=`radial-gradient(600px at ${e.clientX}px ${e.clientY}px,rgba(27,75,138,.08),transparent 70%)`;
+    });
+
+    // KINETIC TYPOGRAPHY
+    const ks=document.getElementById('kinetic');
+    const kbg=document.getElementById('kbg');
+    const mob=()=>window.innerWidth<=767;
+    window.addEventListener('scroll',()=>{
+      const r=ks.getBoundingClientRect();
+      if(r.top>window.innerHeight||r.bottom<0) return;
+      const prog=Math.max(0,Math.min(1,-r.top/(ks.offsetHeight-window.innerHeight)));
+      const sv=mob()?11:18, ev=mob()?35:60;
+      kbg.style.fontSize=(sv+(ev-sv)*prog)+'vw';
+      kbg.style.opacity=(.04+prog*.1).toString();
+    },{passive:true});
+
+    // LÍNEA CONECTORA
+    const pasosEl=document.getElementById('pasos');
+    new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('lv'),400); } });
+    },{threshold:.3}).observe(pasosEl);
+
+    // PULSO EN PASOS
+    document.querySelectorAll('.paso-n').forEach(el=>{
+      new IntersectionObserver(entries=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('vis'); } });
+      },{threshold:.5}).observe(el);
+    });
+
+    // GHOST TEXT PARALLAX
+    const deco=document.getElementById('deco');
+    const precSec=document.getElementById('precios');
+    window.addEventListener('scroll',()=>{
+      if(window.innerWidth<=767||!deco) return;
+      const r=precSec.getBoundingClientRect();
+      deco.style.transform=`translateX(-50%) translateY(${(-r.top/r.height)*60-50}%)`;
+    },{passive:true});
+  </script>
+</body>
+</html>
